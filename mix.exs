@@ -16,9 +16,9 @@ defmodule Mqttc.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
 
-       # Hex
+      # Hex
       package: package(),
-      description: @description
+      description: @description,
       name: "Mqttc",
       docs: [
         main: "Mqttc",
@@ -28,7 +28,7 @@ defmodule Mqttc.MixProject do
           "README.md",
           "LICENSE.txt": [title: "License"]
         ]
-
+      ]
     ]
   end
 
