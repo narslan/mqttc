@@ -156,22 +156,20 @@ defmodule Mqttc do
   Returns `:ok` once the SUBSCRIBE packet has been sent. The acknowledgement
   (`SUBACK`) is handled asynchronously.
 
-  ## Examples
+  ## Example
 
-  Subscribe to multiple topics with default options:
-
-    iex> Mqttc.subscribe(pid, [
-    ...>   {"sensors/temp", fn msg -> IO.inspect(msg, label: "Temp") end},
-    ...>   {"sensors/humidity", fn msg -> IO.inspect(msg, label: "Humidity") end}
-    ...> ])
-    :ok
+      iex> Mqttc.subscribe(pid, [
+        ...>   {"sensors/temp", fn msg -> IO.inspect(msg, label: "Temp") end},
+        ...>   {"sensors/humidity", fn msg -> IO.inspect(msg, label: "Humidity") end}
+        ...> ])
+       :ok
 
   Subscribe with custom QoS and retain handling for all topics:
 
-    iex> Mqttc.subscribe(pid, [
-    ...>   {"alerts/critical", fn msg -> IO.inspect(msg, label: "ALERT") end}
-    ...> ], qos: 1, retain_handling: 2)
-    :ok
+      iex> Mqttc.subscribe(pid, [
+        ...>   {"alerts/critical", fn msg -> IO.inspect(msg, label: "ALERT") end}
+        ...> ], qos: 1, retain_handling: 2)
+      :ok
 
   """
   def subscribe(pid, topics_with_handlers, opts \\ []) do

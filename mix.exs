@@ -5,7 +5,7 @@ defmodule Mqttc.MixProject do
 
   @repo_url "https://github.com/narslan/mqttc"
 
-  @version "0.1.1"
+  @version "0.1.2"
 
   def project do
     [

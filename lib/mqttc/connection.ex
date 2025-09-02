@@ -1,4 +1,5 @@
 defmodule Mqttc.Connection do
+  @moduledoc false
   @behaviour :gen_statem
   require Logger
 
