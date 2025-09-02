@@ -1,7 +1,5 @@
 defmodule Mqttc.Options do
-  @moduledoc """
-  Schemas for validating options using NimbleOptions.
-  """
+  @moduledoc false
 
   @subscribe_schema [
     topics: [

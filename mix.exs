@@ -5,12 +5,12 @@ defmodule Mqttc.MixProject do
 
   @repo_url "https://github.com/narslan/mqttc"
 
-  @version "0.1.0"
+  @version "0.1.1"
 
   def project do
     [
       app: :mqttc,
-      version: "0.1.0",
+      version: @version,
       elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_paths(Mix.env()),

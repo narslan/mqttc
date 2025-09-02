@@ -1,7 +1,5 @@
 defmodule Mqttc.Packet.Connect do
-  @moduledoc """
-  Provides functions to build a CONNECT packet with validated options.
-  """
+  @moduledoc false
 
   @opcode 1
 

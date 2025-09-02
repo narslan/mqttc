@@ -1,7 +1,5 @@
 defmodule Mqttc.Packet.Property do
-  @moduledoc """
-  MQTT v5 Properties and helper functions for Encode/Decode.
-  """
+  @moduledoc false
   import Bitwise
   # Mapping: identifier => {name_atom, decode_fun, write_fun}
   @property_definitions %{

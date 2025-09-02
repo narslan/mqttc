@@ -1,4 +1,5 @@
 defmodule Mqttc.Manager do
+  @moduledoc false
   use GenServer
   require Logger
   alias Mqttc.Connection

@@ -16,22 +16,6 @@ defmodule Mqttc do
   drops, Mqttc tries to reconnect. The disconnect packets from server
   or the execution of `disconnect/1` does not trigger this behaviour.
 
-  ## Auth 
-  Authentication exchange of the MQTT v5 specification is not implemented by this library yet.
-
-  # SSL
-  Mqttc supports SSL by passing `ssl: true` in `start_link/1`. `:ssl_opts`
-  option can be passed to options that will be used by the SSL connection.  
-  To be able to use the system CA certificate store automatically, 
-  you need to use Erlang/OTP 25+.
-  {:ok, pid} = Mqttc.start_link(host: "broker.hivemq.com", port: 8883, 
-               ssl: true, 
-               ssl_opts: [
-                          verify: :verify_peer, 
-                          cacerts: :public_key.cacerts_get()
-                          ])
-  #{NimbleOptions.docs(Mqttc.Options.connect_opts_schema())}
-
   ## Example
 
       {:ok, pid} = Mqttc.start_link_sync(host: "test.mosquitto.org", port: 1883)
@@ -46,6 +30,8 @@ defmodule Mqttc do
 
       # Disconnect
       Mqttc.disconnect(pid)
+
+  #{NimbleOptions.docs(Mqttc.Options.connect_opts_schema())}
 
   """
   alias Mqttc.Manager
@@ -73,6 +59,7 @@ defmodule Mqttc do
 
       iex> {:ok, pid} = Mqttc.start_link_sync(host: "test.mosquitto.org")
       {:ok, #PID<0.123.0>}
+      
   """
   def start_link_sync(opts \\ [], timeout \\ 5_000) do
     caller = self()
@@ -185,6 +172,7 @@ defmodule Mqttc do
     ...>   {"alerts/critical", fn msg -> IO.inspect(msg, label: "ALERT") end}
     ...> ], qos: 1, retain_handling: 2)
     :ok
+
   """
   def subscribe(pid, topics_with_handlers, opts \\ []) do
     # make sure topics is a list of tuples (so single tuple also works)
