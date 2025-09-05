@@ -129,9 +129,23 @@ defmodule Mqttc do
             properties: pub_properties
           )
 
+        start_time = System.monotonic_time()
+
         case Mqttc.Manager.call_publish(pid, packet) do
-          :ok -> :ok
-          {:error, reason} -> {:error, reason}
+          :ok ->
+            :telemetry.execute(
+              [:mqttc, :packet, :published],
+              %{
+                duration: System.monotonic_time() - start_time,
+                size: byte_size(payload)
+              },
+              %{topic: topic, qos: qos}
+            )
+
+            :ok
+
+          {:error, reason} ->
+            {:error, reason}
         end
 
       {:error, %NimbleOptions.ValidationError{} = err} ->

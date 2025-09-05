@@ -118,19 +118,6 @@ defmodule Mqttc.Connection do
   end
 
   ## --- connecting ---
-  def connecting(:info, %Mqttc.Packet.Connack{} = ack, data) do
-    :telemetry.execute(
-      [:mqttc, :connected],
-      %{},
-      %{"data" => data}
-    )
-
-    if ack.reason_code == :success do
-      {:next_state, :connected, data}
-    else
-      {:next_state, :disconnected, %{data | socket: nil}, [{:state_timeout, 2000, :reconnect}]}
-    end
-  end
 
   def connecting(:info, {transport, socket, packet}, data) when transport in [:tcp, :ssl] do
     # Convert packet to binary in case it's an iolist
@@ -139,8 +126,13 @@ defmodule Mqttc.Connection do
     {packets, leftover} = decode_all(buffer, [])
 
     case Enum.find(packets, fn p -> match?(%Connack{}, p) end) do
-      %Connack{reason_code: :accepted} ->
-        # Activate the socket again for further messages
+      %Connack{reason_code: :accepted} = connack ->
+        :telemetry.execute(
+          [:mqttc, :connection, :established],
+          %{},
+          %{data: connack.properties}
+        )
+
         set_active_once({transport, socket})
 
         GenServer.cast(data.manager_pid, :connection_ready)

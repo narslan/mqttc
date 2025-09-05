@@ -13,7 +13,6 @@ defmodule Mqttc.Supervisor do
 
   def start_child(opts) do
     name = Keyword.get(opts, :name, nil)
-    IO.inspect(name, label: "name")
 
     spec = %{
       id: name,
