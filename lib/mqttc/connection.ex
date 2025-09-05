@@ -99,7 +99,6 @@ defmodule Mqttc.Connection do
       when {event_type, event_content} in [{:internal, :connect}, {:state_timeout, :reconnect}] do
     case Mqttc.Sock.connect(data.host, data.port, data.tcp_opts, data.ssl, data.ssl_opts) do
       {:ok, socket} ->
-        Logger.info("Socket connected, sending CONNECT")
         set_active_once(socket)
         Mqttc.Sock.send(socket, Packet.encode(data.connect_options))
         {:next_state, :connecting, %{data | socket: socket}}
@@ -120,11 +119,15 @@ defmodule Mqttc.Connection do
 
   ## --- connecting ---
   def connecting(:info, %Mqttc.Packet.Connack{} = ack, data) do
+    :telemetry.execute(
+      [:mqttc, :connected],
+      %{},
+      %{"data" => data}
+    )
+
     if ack.reason_code == :success do
-      Logger.info("Connected to broker")
       {:next_state, :connected, data}
     else
-      Logger.error("Connack rejected: #{inspect(ack)}")
       {:next_state, :disconnected, %{data | socket: nil}, [{:state_timeout, 2000, :reconnect}]}
     end
   end
@@ -190,7 +193,6 @@ defmodule Mqttc.Connection do
   end
 
   def connected({:call, from}, {:pub_request, %Publish{qos: 0} = pub}, data) do
-    Logger.debug("call from pub request")
     Mqttc.Sock.send(data.socket, Packet.encode(pub))
     {:keep_state, data, [{:reply, from, :ok}]}
   end
