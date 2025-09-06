@@ -11,7 +11,9 @@ defmodule Mqttc.Telemetry do
   @doc """
   | **Event**                                                      | **Level** |
   | -------------------------------------------------------------- | --------- |
-  | `[:mqtcc, :connected]`     
+  | `[:mqtcc, :connected]`  
+  | `[:mqttc, :packet, :published]`  
+  | `[:mqttc, :packet, :subscribed]`     
   """
 
   @spec attach_default_handler() :: :ok

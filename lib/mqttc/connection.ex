@@ -242,7 +242,6 @@ defmodule Mqttc.Connection do
         {:keep_state, data}
 
       {%{from: from}, new_pending} ->
-        Logger.debug("puback received #{identifier}")
         {:keep_state, %{data | pending_pubs: new_pending}, [{:reply, from, :ok}]}
     end
   end
@@ -309,7 +308,6 @@ defmodule Mqttc.Connection do
           {acc, acts}
 
         %Puback{} = puback, {acc, acts} ->
-          Logger.info("got puback")
           {acc, acts ++ [{:next_event, :internal, {:incoming_puback, puback.identifier}}]}
 
         %Publish{} = pub, {acc, acts} ->
@@ -317,7 +315,6 @@ defmodule Mqttc.Connection do
           {acc, acts}
 
         %Disconnect{}, {acc, acts} ->
-          Logger.info("got disconnect from broker")
           {acc, acts ++ [{:next_event, :internal, :broker_disconnect}]}
 
         %Pubrec{} = pubrec, {acc, acts} ->
@@ -327,7 +324,6 @@ defmodule Mqttc.Connection do
           {acc, acts ++ [{:next_event, :internal, {:incoming_pubcomp, pubcomp.identifier}}]}
 
         %Pingresp{}, {acc, acts} ->
-          Logger.info("got ping")
           {acc, acts}
 
         %Auth{}, {acc, acts} ->
