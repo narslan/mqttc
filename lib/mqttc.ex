@@ -129,14 +129,14 @@ defmodule Mqttc do
             properties: pub_properties
           )
 
-        start_time = System.monotonic_time()
+        start_time = System.monotonic_time(:millisecond)
 
         case Mqttc.Manager.call_publish(pid, packet) do
           :ok ->
             :telemetry.execute(
               [:mqttc, :packet, :published],
               %{
-                duration: System.monotonic_time() - start_time,
+                duration: System.monotonic_time(:millisecond) - start_time,
                 size: byte_size(payload)
               },
               %{topic: topic, qos: qos}
@@ -214,7 +214,23 @@ defmodule Mqttc do
             payload: sub_payload
           )
 
-        GenServer.call(pid, {:subscribe_packet, packet}, v[:timeout])
+        start_time = System.monotonic_time(:millisecond)
+
+        case Mqttc.Manager.call_subscribe(pid, packet) do
+          :ok ->
+            :telemetry.execute(
+              [:mqttc, :packet, :subscribed],
+              %{
+                duration: System.monotonic_time(:millisecond) - start_time
+              },
+              %{topics: Enum.map(v[:topics], &elem(&1, 0)), qos: v[:qos]}
+            )
+
+            :ok
+
+          {:error, reason} ->
+            {:error, reason}
+        end
 
       {:error, %NimbleOptions.ValidationError{} = err} ->
         {:error, {:invalid_options, Exception.message(err)}}

@@ -137,7 +137,7 @@ defmodule Mqttc.Manager do
     {:reply, {:error, :not_connected}, state}
   end
 
-  def handle_call({:subscribe_packet, sub_packet}, from, state) do
+  def handle_call({:subscribe, sub_packet}, from, %{conn: _conn, connected?: true} = state) do
     Connection.send_subscribe(state.conn, sub_packet)
 
     pending_subs_calls =
@@ -146,13 +146,17 @@ defmodule Mqttc.Manager do
     {:noreply, %{state | pending_subs_calls: pending_subs_calls}}
   end
 
+  def handle_call({:subscribe, _pub}, _from, %{conn: _conn, connected?: false} = state) do
+    {:reply, {:error, :not_connected}, state}
+  end
+
   # ------------------------------------------------------------
-  # Call API für unsubscribe
+  # Call API for unsubscribe
   # ------------------------------------------------------------
   def handle_call({:unsubscribe_packet, unsub_packet}, from, state) do
     Connection.send_unsubscribe(state.conn, unsub_packet)
 
-    # Caller merken, bis UNSUBACK kommt
+    # Store Caller, until UNSUBACK arrives
     pending_unsubs = Map.put(state.pending_unsubs || %{}, unsub_packet.identifier, from)
     {:noreply, %{state | pending_unsubs: pending_unsubs}}
   end
@@ -164,6 +168,7 @@ defmodule Mqttc.Manager do
   # Convenience wrappers
   # ------------------------------------------------------------
   def call_publish(pid, req), do: GenServer.call(pid, {:publish, req})
+  def call_subscribe(pid, req), do: GenServer.call(pid, {:subscribe, req})
   def cast_disconnect(pid, req), do: GenServer.cast(pid, {:disconnect, req})
 
   # ------------------------------------------------------------

@@ -18,7 +18,8 @@ defmodule Mqttc.Telemetry do
   def attach_default_handler do
     events = [
       [:mqttc, :connection, :established],
-      [:mqttc, :packet, :published]
+      [:mqttc, :packet, :published],
+      [:mqttc, :packet, :subscribed]
     ]
 
     :telemetry.attach_many(
@@ -47,7 +48,11 @@ defmodule Mqttc.Telemetry do
 
       [:packet, :published] ->
         Logger.info("Published topic #{inspect(metadata.topic)}")
-        Logger.info("Publish duration #{inspect(measurements.duration)}")
+        Logger.info("Publish duration #{inspect(measurements.duration)} ms")
+
+      [:packet, :subscribed] ->
+        Logger.info("Subscribed topic #{inspect(metadata.topics)}")
+        Logger.info("Subscribe duration #{inspect(measurements.duration)} ms")
 
       _ ->
         Logger.info("not implemented")
