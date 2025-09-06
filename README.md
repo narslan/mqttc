@@ -8,7 +8,7 @@ It aims to provide a reliable MQTT client with a simple user-facing API.
 - Interface for sending MQTT v5 support (CONNECT, SUBSCRIBE, PUBLISH, UNSUBSCRIBE, PING, DISCONNECT).
 - Automatic Reconnections
 - SSL
-
+- Telemetry support
 ---
 
 ## Installation
