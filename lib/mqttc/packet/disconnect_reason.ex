@@ -17,16 +17,22 @@ defmodule Mqttc.Packet.Disconnect.ReasonCodes do
     0x8E => {:session_taken_over, "Session taken over"},
     0x8F => {:topic_filter_invalid, "Topic filter invalid"},
     0x90 => {:topic_name_invalid, "Topic name invalid"},
+    0x93 => {:receive_maximum_exceeded, "Receive Maximum exceeded"},
+    0x94 => {:topic_alias_invalid, "Topic Alias invalid"},
     0x95 => {:packet_too_large, "Packet too large"},
+    0x96 => {:message_rate_too_high, "Message rate too high"},
     0x97 => {:quota_exceeded, "Quota exceeded"},
-    0x99 => {:administrative_action, "Administrative action"},
-    0x9A => {:payload_format_invalid, "Payload format invalid"},
-    0x9B => {:retain_not_supported, "Retain not supported"},
-    0x9C => {:qos_not_supported, "QoS not supported"},
-    0x9D => {:use_another_server, "Use another server"},
-    0x9E => {:server_moved, "Server moved"},
-    0x9F => {:shared_subs_not_supported, "Shared subscriptions not supported"},
-    0xA0 => {:connection_rate_exceeded, "Connection rate exceeded"}
+    0x98 => {:administrative_action, "Administrative action"},
+    0x99 => {:payload_format_invalid, "Payload format invalid"},
+    0x9A => {:retain_not_supported, "Retain not supported"},
+    0x9B => {:qos_not_supported, "QoS not supported"},
+    0x9C => {:use_another_server, "Use another server"},
+    0x9D => {:server_moved, "Server moved"},
+    0x9E => {:shared_subs_not_supported, "Shared subscriptions not supported"},
+    0x9F => {:connection_rate_exceeded, "Connection rate exceeded"},
+    0xA0 => {:maximum_connect_time, "Maximum connect time"},
+    0xA1 => {:subscription_identifier_not_supported, "Subscription Identifiers not supported"},
+    0xA2 => {:wildcard_subscriptons_not_supported, "Wildcard Subscriptions not supported"}
   }
 
   @doc false
