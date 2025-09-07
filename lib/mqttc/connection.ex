@@ -343,7 +343,6 @@ defmodule Mqttc.Connection do
     end
   end
 
-  # Unexpected loss → reconnect
   defp schedule_reconnect(data) do
     cancel_ping(data)
 
