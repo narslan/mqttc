@@ -126,10 +126,8 @@ defmodule Mqttc.Connection do
   ## --- connecting ---
 
   def connecting(:info, {transport, socket, packet}, data) when transport in [:tcp, :ssl] do
-    # Convert packet to binary in case it's an iolist
-    packet_bin = :erlang.iolist_to_binary(packet)
-    buffer = (data.buffer || <<>>) <> packet_bin
-    {packets, leftover} = decode_all(buffer, [])
+    new_buffer = [data.buffer || [] | packet]
+    {packets, leftover} = decode_all(new_buffer, [])
 
     case Enum.find(packets, fn p -> match?(%Connack{}, p) end) do
       %Connack{reason_code: :accepted} = connack ->
@@ -209,10 +207,6 @@ defmodule Mqttc.Connection do
     {:keep_state, data, [{:reply, from}]}
   end
 
-  def connected({:call, from}, :wait_connection, data) do
-    {:keep_state, data, [{:reply, from, :ok}]}
-  end
-
   # Handle disconnect event fom state machine if we disconnect on purpose.
   def connected({:call, from}, {:disconnect_request, %Disconnect{} = packet}, data) do
     Mqttc.Sock.send(data.socket, Packet.encode(packet))
@@ -278,10 +272,8 @@ defmodule Mqttc.Connection do
   end
 
   def connected(:info, {transport, socket, packet}, data) when transport in [:tcp, :ssl] do
-    packet_bin = :erlang.iolist_to_binary(packet)
-    buffer = (data.buffer || <<>>) <> packet_bin
-
-    {packets, leftover} = decode_all(buffer, [])
+    new_buffer = [data.buffer || [] | packet]
+    {packets, leftover} = decode_all(new_buffer, [])
 
     {new_data, actions} =
       Enum.reduce(packets, {%{data | buffer: leftover}, []}, fn
