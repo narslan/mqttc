@@ -161,17 +161,6 @@ defmodule Mqttc.Connection do
     {:next_state, :disconnected, data, [{{:timeout, :reconnect}, 1500, nil}]}
   end
 
-  def connected(:internal, {:incoming_puback, %Puback{identifier: id}}, data) do
-    case Map.pop(data.pending_pubs, id) do
-      {%{from: from}, new_pending} ->
-        :gen_statem.reply(from, :ok)
-        {:keep_state, %{data | pending_pubs: new_pending}}
-
-      _ ->
-        {:keep_state, data}
-    end
-  end
-
   def connected(:info, :pingreq, data) do
     Mqttc.Sock.send(data.socket, Packet.encode(%Pingreq{}))
     # schedule the next ping
@@ -192,9 +181,9 @@ defmodule Mqttc.Connection do
   def connected({:call, from}, {:pub_request, %Publish{qos: 1} = pub}, data) do
     Mqttc.Sock.send(data.socket, Packet.encode(pub))
 
-    new_pending = Map.put(data.pending_pubs, pub.identifier, %{pub: pub, from: from})
+    pending = Map.put(data.pending_pubs, pub.identifier, %{pub: pub, from: from})
 
-    {:keep_state, %{data | pending_pubs: new_pending}}
+    {:keep_state, %{data | pending_pubs: pending}}
   end
 
   def connected({:call, from}, {:pub_request, %Publish{qos: 2} = pub}, data) do
