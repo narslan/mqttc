@@ -7,6 +7,7 @@ defmodule Mqttc.AuthIntegrationTest do
   @valid_username "rw"
   @valid_password "readwrite"
 
+  @tag :integration
   test "[integration] connect with valid credentials works" do
     {:ok, pid} =
       Mqttc.start_link_sync(

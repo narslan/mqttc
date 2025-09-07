@@ -238,11 +238,10 @@ defmodule Mqttc.Connection do
   def connected(:internal, {:incoming_pubrec, id}, data) do
     case Map.get(data.pending_pubs, id) do
       nil ->
-        Logger.warning("unexpected PUBREC #{id}")
+        Logger.warning("received PUBREC for unknown id #{id}")
         {:keep_state, data}
 
       %{stage: :waiting_pubrec} ->
-        Logger.debug("sending PUBREL #{id}")
         pubrel = %Pubrel{identifier: id}
         Mqttc.Sock.send(data.socket, Packet.encode(pubrel))
 
@@ -316,7 +315,6 @@ defmodule Mqttc.Connection do
           {acc, acts}
 
         %Auth{}, {acc, acts} ->
-          Logger.info("got auth")
           {acc, acts}
       end)
 
