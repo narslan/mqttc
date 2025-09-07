@@ -11,7 +11,7 @@ defmodule Mqttc.Telemetry do
   @doc """
   | **Event**                                                      | **Level** |
   | -------------------------------------------------------------- | --------- |
-  | `[:mqtcc, :connected]`  
+  | `[:mqttc, :connected, :established]`  
   | `[:mqttc, :packet, :published]`  
   | `[:mqttc, :packet, :subscribed]`     
   """
