@@ -1,9 +1,6 @@
-defmodule Mqttc.Disconnect.ReasonCodes do
+defmodule Mqttc.Packet.Disconnect.ReasonCodes do
   @moduledoc """
-  Helper für MQTT v5 DISCONNECT Reason Codes.
-
-  Dient zur Übersetzung von numerischen Codes (z. B. 0x8E) in
-  menschenlesbare Namen und optionale Erläuterungen.
+  Helper for MQTT v5 DISCONNECT Reason Codes.
   """
 
   @codes %{
@@ -32,32 +29,22 @@ defmodule Mqttc.Disconnect.ReasonCodes do
     0xA0 => {:connection_rate_exceeded, "Connection rate exceeded"}
   }
 
-  @doc """
-  Gibt `{atom_name, description}` für den Code zurück.
-  """
+  @doc false
   @spec lookup(non_neg_integer()) ::
           {atom(), String.t()} | {:unknown, String.t()}
   def lookup(code) do
     Map.get(@codes, code, {:unknown, "Unknown reason code"})
   end
 
-  @doc """
-  Gibt nur den atomischen Namen zurück (`:normal_disconnection` etc.).
-  """
+  @doc false
   def name(code) do
-    case lookup(code) do
-      {name, _} -> name
-      other -> other
-    end
+    {name, _} = lookup(code)
+    name
   end
 
-  @doc """
-  Gibt nur die Beschreibung als String zurück.
-  """
+  @doc false
   def description(code) do
-    case lookup(code) do
-      {_, desc} -> desc
-      {_, other} -> other
-    end
+    {_, desc} = lookup(code)
+    desc
   end
 end

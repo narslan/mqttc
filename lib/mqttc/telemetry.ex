@@ -20,8 +20,12 @@ defmodule Mqttc.Telemetry do
   def attach_default_handler do
     events = [
       [:mqttc, :connection, :established],
+      [:mqttc, :connection, :lost],
+      [:mqttc, :connection, :reconnect],
+      [:mqttc, :connection, :disconnected],
       [:mqttc, :packet, :published],
-      [:mqttc, :packet, :subscribed]
+      [:mqttc, :packet, :subscribed],
+      [:mqttc, :packet, :unsubscribed]
     ]
 
     :telemetry.attach_many(
@@ -48,6 +52,15 @@ defmodule Mqttc.Telemetry do
       [:connection, :established] ->
         Logger.info("Connection established #{inspect(metadata.data)}")
 
+      [:connection, :lost] ->
+        Logger.info("Connection lost")
+
+      [:connection, :reconnect] ->
+        Logger.info("Reconnect")
+
+      [:connection, :disconnected] ->
+        Logger.info("Disconnected, reason  #{inspect(metadata.reason)}")
+
       [:packet, :published] ->
         Logger.info("Published topic #{inspect(metadata.topic)}")
         Logger.info("Publish duration #{inspect(measurements.duration)} ms")
@@ -55,6 +68,9 @@ defmodule Mqttc.Telemetry do
       [:packet, :subscribed] ->
         Logger.info("Subscribed topic #{inspect(metadata.topics)}")
         Logger.info("Subscribe duration #{inspect(measurements.duration)} ms")
+
+      [:packet, :unsubscribed] ->
+        Logger.info("UnSubscribed topics #{inspect(metadata.topics)}")
 
       _ ->
         Logger.info("not implemented")

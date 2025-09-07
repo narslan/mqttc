@@ -91,7 +91,6 @@ defmodule Mqttc.Connection do
 
   ## --- disconnected ---
   def disconnected(:enter, _old, _data) do
-    Logger.info("Entering disconnected state")
     {:keep_state_and_data, [{:state_timeout, 1000, :reconnect}]}
   end
 
@@ -105,6 +104,13 @@ defmodule Mqttc.Connection do
 
       {:error, reason} ->
         Logger.error("Connection failed: #{inspect(reason)}")
+
+        :telemetry.execute(
+          [:mqttc, :connection, :lost],
+          %{},
+          %{}
+        )
+
         {:keep_state_and_data, [{:state_timeout, 2000, :reconnect}]}
     end
   end
@@ -302,7 +308,13 @@ defmodule Mqttc.Connection do
           send(acc.manager_pid, {:incoming_publish, pub})
           {acc, acts}
 
-        %Disconnect{}, {acc, acts} ->
+        %Disconnect{} = discon, {acc, acts} ->
+          :telemetry.execute(
+            [:mqttc, :connection, :disconnected],
+            %{},
+            %{reason: Mqttc.Packet.Disconnect.ReasonCodes.description(discon.reason_code)}
+          )
+
           {acc, acts ++ [{:next_event, :internal, :broker_disconnect}]}
 
         %Pubrec{} = pubrec, {acc, acts} ->
@@ -342,6 +354,12 @@ defmodule Mqttc.Connection do
   # Unexpected loss → reconnect
   defp schedule_reconnect(data) do
     cancel_ping(data)
+
+    :telemetry.execute(
+      [:mqttc, :connection, :reconnect],
+      %{},
+      %{}
+    )
 
     {:next_state, :disconnected, %{data | socket: nil, ping_ref: nil},
      [{:next_event, :internal, :connect}]}
