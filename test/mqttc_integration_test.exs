@@ -4,7 +4,7 @@ defmodule Mqttc.IntegrationTest do
   @tag :integration
   test "[integration] simple publish/subscribe" do
     assert :ok = Mqttc.TestConnection.connect()
-    {:ok, pid} = Mqttc.start_link_sync(name: :broker1)
+    {:ok, pid} = Mqttc.start_link_sync()
 
     parent = self()
     test_topic = "sensors/temp"
@@ -21,7 +21,7 @@ defmodule Mqttc.IntegrationTest do
   @tag :integration
   test "[integration] qos1 delivery with ack" do
     assert :ok = Mqttc.TestConnection.connect()
-    {:ok, pid} = Mqttc.start_link_sync(name: :broker2)
+    {:ok, pid} = Mqttc.start_link_sync()
 
     parent = self()
     topic = "qos/test"
@@ -38,7 +38,7 @@ defmodule Mqttc.IntegrationTest do
   @tag :integration
   test "[integration] wildcard subscription" do
     :ok = Mqttc.TestConnection.connect()
-    {:ok, pid} = Mqttc.start_link_sync(name: :broker2)
+    {:ok, pid} = Mqttc.start_link_sync()
 
     topic_filter = "sensors/+/humidity"
 

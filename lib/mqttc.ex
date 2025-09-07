@@ -250,7 +250,7 @@ defmodule Mqttc do
     topics = List.wrap(topics)
     identifier = :rand.uniform(65_535)
 
-    # 1) Pending Unsubs vormerken, Reihenfolge wichtig
+    # Store pending unsubscribe packets. 
     GenServer.cast(pid, {:pending_unsubscribe, identifier, topics})
 
     unsub_packet = %Mqttc.Packet.Unsubscribe{
@@ -258,7 +258,21 @@ defmodule Mqttc do
       payload: topics
     }
 
-    GenServer.call(pid, {:unsubscribe_packet, unsub_packet})
+    start_time = System.monotonic_time(:millisecond)
+
+    case Manager.call_unsubscribe(pid, unsub_packet) do
+      :ok ->
+        :telemetry.execute(
+          [:mqttc, :packet, :unsubscribed],
+          %{duration: System.monotonic_time(:millisecond) - start_time},
+          %{topics: topics}
+        )
+
+        :ok
+
+      {:error, reason} ->
+        {:error, reason}
+    end
   end
 
   @doc """
@@ -271,6 +285,13 @@ defmodule Mqttc do
   """
   def disconnect(pid, opts \\ []) do
     disc_packet = Mqttc.Packet.Disconnect.new(opts)
+
     Manager.cast_disconnect(pid, disc_packet)
+
+    :telemetry.execute(
+      [:mqttc, :connection, :disconnected],
+      %{},
+      %{reason: Keyword.get(opts, :reason, :client_request)}
+    )
   end
 end

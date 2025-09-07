@@ -153,7 +153,7 @@ defmodule Mqttc.Manager do
   # ------------------------------------------------------------
   # Call API for unsubscribe
   # ------------------------------------------------------------
-  def handle_call({:unsubscribe_packet, unsub_packet}, from, state) do
+  def handle_call({:unsubscribe, unsub_packet}, from, state) do
     Connection.send_unsubscribe(state.conn, unsub_packet)
 
     # Store Caller, until UNSUBACK arrives
@@ -169,6 +169,7 @@ defmodule Mqttc.Manager do
   # ------------------------------------------------------------
   def call_publish(pid, req), do: GenServer.call(pid, {:publish, req})
   def call_subscribe(pid, req), do: GenServer.call(pid, {:subscribe, req})
+  def call_unsubscribe(pid, req), do: GenServer.call(pid, {:unsubscribe, req})
   def cast_disconnect(pid, req), do: GenServer.cast(pid, {:disconnect, req})
 
   # ------------------------------------------------------------
