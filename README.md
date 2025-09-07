@@ -18,7 +18,7 @@ Add `mqttc` to your dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:mqttc, "~> 0.1.4"}
+    {:mqttc, "~> 0.1.5"}
   ]
 end
 ```
