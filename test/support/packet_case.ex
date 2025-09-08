@@ -10,7 +10,6 @@ defmodule Mqttc.PacketCase do
   # Roundtrip assertion for arbitrary packets
   # -----------------------------
   def assert_roundtrip(packet) do
-    # <- hier wird expected_struct/1 genutzt
     packet = expected_struct(packet)
     encoded = Packet.encode(packet)
 
@@ -46,14 +45,14 @@ defmodule Mqttc.PacketCase do
   defp expected_struct(packet) do
     module = packet.__struct__
 
-    # opcode aus Modul-Attribut, fallback auf __META__
+    # opcode from module attribute, fallback to __META__
     opcode =
       case module.__info__(:attributes)[:opcode] do
         [value] -> value
         _ -> Map.get(packet.__META__, :opcode)
       end
 
-    # flags aus Modul-Attribut, fallback auf __META__ oder 0
+    # flags from module attribute, fallback to __META__ or 0
     flags =
       case module.__info__(:attributes)[:flags] do
         [value] -> value

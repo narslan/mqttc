@@ -130,7 +130,7 @@ defmodule Mqttc.Connection do
     {packets, leftover} = decode_all(new_buffer, [])
 
     case Enum.find(packets, fn p -> match?(%Connack{}, p) end) do
-      %Connack{reason_code: :accepted} = connack ->
+      %Connack{reason_code: :success} = connack ->
         :telemetry.execute(
           [:mqttc, :connection, :established],
           %{},

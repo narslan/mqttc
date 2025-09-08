@@ -30,7 +30,7 @@ defmodule Mqttc.Packet.AllPacketsTest do
      ]},
     {Mqttc.Packet.Connack,
      [
-       %{session_present: true, reason_code: {:refused, :unsupported_protocol_version}},
+       %{session_present: true, reason_code: {:refused, :malformed_packet}},
        %{session_present: false}
      ]},
     {Mqttc.Packet.Publish,
