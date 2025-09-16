@@ -23,6 +23,7 @@ defmodule Mqttc.Telemetry do
       [:mqttc, :connection, :lost],
       [:mqttc, :connection, :reconnect],
       [:mqttc, :connection, :disconnected],
+      [:mqttc, :connection, :closed],
       [:mqttc, :packet, :published],
       [:mqttc, :packet, :subscribed],
       [:mqttc, :packet, :unsubscribed]
@@ -60,6 +61,9 @@ defmodule Mqttc.Telemetry do
 
       [:connection, :disconnected] ->
         Logger.info("Disconnected, reason  #{inspect(metadata.reason)}")
+
+      [:connection, :closed] ->
+        Logger.info("Broker closed connection")
 
       [:packet, :published] ->
         Logger.info("Published topic #{inspect(metadata.topic)}")

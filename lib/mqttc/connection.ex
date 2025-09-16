@@ -116,10 +116,22 @@ defmodule Mqttc.Connection do
   end
 
   def disconnected(:info, {:ssl_closed, _reason}, data) do
+    :telemetry.execute(
+      [:mqttc, :connection, :closed],
+      %{},
+      %{}
+    )
+
     {:stop, :normal, data}
   end
 
   def disconnected(:info, {:tcp_closed, _socket}, data) do
+    :telemetry.execute(
+      [:mqttc, :connection, :closed],
+      %{},
+      %{}
+    )
+
     {:stop, :normal, data}
   end
 

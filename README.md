@@ -54,8 +54,15 @@ Authenticate and connect:
 ```
  
  Usage with ssl:
- ```elixir
+```elixir
 {:ok, pid} = Mqttc.start_link(host: "broker.hivemq.com", port: 8883, ssl: true, ssl_opts: [  verify: :verify_peer, cacerts: :public_key.cacerts_get()])
+```
+
+### Test:
+Integration test requires a running mosquitto instance.
+```sh
+mix test # run all tests, 
+mix test --exclude integration  # test packet encoding and decoding, excludes tests with mosquitto
 ```
 ## License
 

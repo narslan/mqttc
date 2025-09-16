@@ -117,39 +117,42 @@ defmodule Mqttc do
 
     input = Keyword.merge(opts, payload: payload, topic: topic)
 
-    case NimbleOptions.validate(input, Mqttc.Options.publish_schema()) do
-      {:ok, _} ->
-        packet =
-          Mqttc.Packet.Publish.build(
-            topic: topic,
-            payload: payload,
-            qos: qos,
-            dup: dup,
-            retain: retain,
-            properties: pub_properties
+    with {:ok, opts} <- NimbleOptions.validate(input, Mqttc.Options.publish_schema()),
+         :ok <- validate_publish_topic(opts[:topic]) do
+      packet =
+        Mqttc.Packet.Publish.build(
+          topic: topic,
+          payload: payload,
+          qos: qos,
+          dup: dup,
+          retain: retain,
+          properties: pub_properties
+        )
+
+      start_time = System.monotonic_time(:millisecond)
+
+      case Mqttc.Manager.call_publish(pid, packet) do
+        :ok ->
+          :telemetry.execute(
+            [:mqttc, :packet, :published],
+            %{
+              duration: System.monotonic_time(:millisecond) - start_time,
+              size: byte_size(payload)
+            },
+            %{topic: topic, qos: qos}
           )
 
-        start_time = System.monotonic_time(:millisecond)
+          :ok
 
-        case Mqttc.Manager.call_publish(pid, packet) do
-          :ok ->
-            :telemetry.execute(
-              [:mqttc, :packet, :published],
-              %{
-                duration: System.monotonic_time(:millisecond) - start_time,
-                size: byte_size(payload)
-              },
-              %{topic: topic, qos: qos}
-            )
-
-            :ok
-
-          {:error, reason} ->
-            {:error, reason}
-        end
-
+        {:error, reason} ->
+          {:error, reason}
+      end
+    else
       {:error, %NimbleOptions.ValidationError{} = err} ->
         {:error, {:invalid_options, Exception.message(err)}}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
@@ -293,5 +296,13 @@ defmodule Mqttc do
       %{},
       %{reason: Keyword.get(opts, :reason, :client_request)}
     )
+  end
+
+  def validate_publish_topic(topic) do
+    if String.contains?(topic, ["#", "+"]) do
+      {:error, "publish topic must not contain wildcards (#, +)"}
+    else
+      :ok
+    end
   end
 end
