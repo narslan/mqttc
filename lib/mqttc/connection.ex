@@ -169,11 +169,23 @@ defmodule Mqttc.Connection do
 
   def connecting(:info, {transport_closed, _sock}, data)
       when transport_closed in [:tcp_closed, :ssl_closed] do
+    :telemetry.execute(
+      [:mqttc, :connection, :closed],
+      %{},
+      %{}
+    )
+
     {:next_state, :disconnected, data, [{{:timeout, :reconnect}, 1500, nil}]}
   end
 
-  def connecting(:info, {transport_error, _sock, _reason}, data)
+  def connecting(:info, {transport_error, _sock, reason}, data)
       when transport_error in [:tcp_error, :ssl_error] do
+    :telemetry.execute(
+      [:mqttc, :connection, :transport_error],
+      %{},
+      %{reason: reason}
+    )
+
     {:next_state, :disconnected, data, [{{:timeout, :reconnect}, 1500, nil}]}
   end
 
