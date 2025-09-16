@@ -129,21 +129,36 @@ defmodule Mqttc.Manager do
   # ------------------------------------------------------------
   @impl true
   def handle_call({:publish, pub}, _from, %{conn: conn, connected?: true} = state) do
-    Connection.send_publish(conn, pub)
-    {:reply, :ok, state}
+    reply =
+      call_safe(fn ->
+        Connection.send_publish(conn, pub)
+        :ok
+      end)
+
+    {:reply, reply, state}
   end
 
   def handle_call({:publish, _pub}, _from, %{conn: _conn, connected?: false} = state) do
     {:reply, {:error, :not_connected}, state}
   end
 
-  def handle_call({:subscribe, sub_packet}, from, %{conn: _conn, connected?: true} = state) do
-    Connection.send_subscribe(state.conn, sub_packet)
+  def handle_call({:subscribe, sub_packet}, from, %{conn: conn, connected?: true} = state) do
+    reply =
+      call_safe(fn ->
+        Connection.send_subscribe(conn, sub_packet)
+        :ok
+      end)
 
-    pending_subs_calls =
-      Map.put(state.pending_subs_calls || %{}, sub_packet.identifier, from)
+    case reply do
+      :ok ->
+        pending_subs_calls =
+          Map.put(state.pending_subs_calls || %{}, sub_packet.identifier, from)
 
-    {:noreply, %{state | pending_subs_calls: pending_subs_calls}}
+        {:noreply, %{state | pending_subs_calls: pending_subs_calls}}
+
+      {:error, :no_connection_process} ->
+        {:reply, reply, state}
+    end
   end
 
   def handle_call({:subscribe, _pub}, _from, %{conn: _conn, connected?: false} = state) do
@@ -154,11 +169,22 @@ defmodule Mqttc.Manager do
   # Call API for unsubscribe
   # ------------------------------------------------------------
   def handle_call({:unsubscribe, unsub_packet}, from, state) do
-    Connection.send_unsubscribe(state.conn, unsub_packet)
+    reply =
+      call_safe(fn ->
+        Connection.send_unsubscribe(state.conn, unsub_packet)
+        :ok
+      end)
+
+    case reply do
+      :ok ->
+        pending_unsubs = Map.put(state.pending_unsubs || %{}, unsub_packet.identifier, from)
+        {:noreply, %{state | pending_unsubs: pending_unsubs}}
+
+      {:error, :no_connection_process} ->
+        {:reply, reply, state}
+    end
 
     # Store Caller, until UNSUBACK arrives
-    pending_unsubs = Map.put(state.pending_unsubs || %{}, unsub_packet.identifier, from)
-    {:noreply, %{state | pending_unsubs: pending_unsubs}}
   end
 
   def handle_call(_req, _from, %{connected?: false} = state),
@@ -192,4 +218,13 @@ defmodule Mqttc.Manager do
     do: match_levels(t_rest, f_rest)
 
   defp match_levels(_, _), do: false
+
+  def call_safe(fun) when is_function(fun, 0) do
+    try do
+      fun.()
+    catch
+      :exit, {:noproc, _} ->
+        {:error, :no_connection_process}
+    end
+  end
 end

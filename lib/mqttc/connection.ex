@@ -356,7 +356,7 @@ defmodule Mqttc.Connection do
      [{:next_event, :internal, :connect}]}
   end
 
-  # Clean stop (broker or client requested) → no reconnect
+  # Clean stop (broker or client requested) -> no reconnect
   defp clean_disconnect(data) do
     cancel_ping(data)
 
