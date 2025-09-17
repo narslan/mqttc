@@ -65,7 +65,7 @@ defmodule Mqttc.Packet.Publish do
   # Safely extract topic and packet ID
   defp safe_extract_topic_and_id(<<topic_len::16, rest::binary>>, qos)
        when byte_size(rest) >= topic_len do
-    <<topic::binary-size(topic_len), rest2::binary>> = rest
+    <<topic::binary-size(^topic_len), rest2::binary>> = rest
 
     {identifier, rest3} =
       case qos do

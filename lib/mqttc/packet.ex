@@ -69,7 +69,7 @@ defmodule Mqttc.Packet do
           # If we don't have enough data, we return full packet to the Connection as we can process further.  
           {:error, :incomplete, full}
         else
-          <<body::binary-size(len), leftover::binary>> = remaining
+          <<body::binary-size(^len), leftover::binary>> = remaining
 
           # We deliver the full body of the packet to the correct packet remaining length stripped off.
           packet =
@@ -142,7 +142,7 @@ defmodule Mqttc.Packet do
 
   def parse_properties(bin, packet_type) do
     {prop_len, rest} = Property.decode_remaining_length(bin)
-    <<props_bin::binary-size(prop_len), leftover::binary>> = rest
+    <<props_bin::binary-size(^prop_len), leftover::binary>> = rest
 
     props = parse_properties_acc(props_bin, Property.allowed(packet_type), [])
 

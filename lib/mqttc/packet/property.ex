@@ -100,7 +100,7 @@ defmodule Mqttc.Packet.Property do
   # Utility functions to pack and unpack property data
   def read_binary(data) do
     <<len::16, rest::binary>> = data
-    <<bin::binary-size(len), rest2::binary>> = rest
+    <<bin::binary-size(^len), rest2::binary>> = rest
     {bin, rest2}
   end
 
@@ -131,7 +131,7 @@ defmodule Mqttc.Packet.Property do
   def read_utf8(data) when is_binary(data) do
     case data do
       <<length::16, rest::binary>> when byte_size(rest) >= length ->
-        <<utf_string::binary-size(length), remaining::binary>> = rest
+        <<utf_string::binary-size(^length), remaining::binary>> = rest
         {utf_string, remaining}
 
       _ ->

@@ -39,7 +39,7 @@ defmodule Mqttc.Packet.Unsubscribe do
   defp parse_payload(<<>>), do: []
 
   defp parse_payload(<<topic_length::size(16), rest::binary>>) do
-    <<topic::binary-size(topic_length), rest::binary>> = rest
+    <<topic::binary-size(^topic_length), rest::binary>> = rest
 
     [topic] ++ parse_payload(rest)
   end
