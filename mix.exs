@@ -54,7 +54,8 @@ defmodule Mqttc.MixProject do
     [
       {:nimble_options, "~> 1.1"},
       {:telemetry, "~> 1.0"},
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:stream_data, "~> 1.0", only: :test}
     ]
   end
 end
