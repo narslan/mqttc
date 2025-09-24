@@ -12,8 +12,14 @@ defmodule Mqttc.Telemetry do
   | **Event**                                                      | **Level** |
   | -------------------------------------------------------------- | --------- |
   | `[:mqttc, :connection, :established]`  
+  | `[:mqttc, :connection, :lost]`  
+  | `[:mqttc, :connection, :reconnect]`  
+  | `[:mqttc, :connection, :disconnected]`  
+  | `[:mqttc, :connection, :closed]`  
+  | `[:mqttc, :connection, :transport_error]`  
   | `[:mqttc, :packet, :published]`  
-  | `[:mqttc, :packet, :subscribed]`     
+  | `[:mqttc, :packet, :subscribed]`  
+  | `[:mqttc, :packet, :unsubscribed]`  
   """
 
   @spec attach_default_handler() :: :ok
