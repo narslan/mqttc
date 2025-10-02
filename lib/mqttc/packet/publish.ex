@@ -1,6 +1,5 @@
 defmodule Mqttc.Packet.Publish do
   @moduledoc false
-  require Logger
   alias Mqttc.Packet
   alias Mqttc.Packet.Property
 

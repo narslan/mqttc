@@ -1,6 +1,5 @@
 defmodule Mqttc.Packet.Unsubscribe do
   @moduledoc false
-  require Logger
   alias Mqttc.Packet
   alias Mqttc.Packet.Property
 
