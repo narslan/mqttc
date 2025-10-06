@@ -1,6 +1,5 @@
 defmodule Mqttc.Packet.Publish do
   @moduledoc false
-  require Logger
   alias Mqttc.Packet
   alias Mqttc.Packet.Property
 
@@ -124,5 +123,13 @@ defmodule Mqttc.Packet.Publish do
 
     defp flag(f) when f in [0, nil, false], do: 0
     defp flag(_), do: 1
+  end
+
+  defimpl Inspect do
+    import Inspect.Algebra
+
+    def inspect(packet, options) do
+      concat(["#Publish<", packet.topic, ">: ", to_doc(packet.payload, options)])
+    end
   end
 end

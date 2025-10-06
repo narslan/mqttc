@@ -22,8 +22,6 @@ defmodule Mqttc.Packet do
     Property
   }
 
-  require Logger
-
   @opaque message ::
             Packet.Connect.t()
             | Packet.Connack.t()

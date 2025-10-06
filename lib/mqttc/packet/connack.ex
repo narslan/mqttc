@@ -3,7 +3,6 @@ defmodule Mqttc.Packet.Connack do
 
   alias Mqttc.Packet
   alias Mqttc.Packet.Connack.ReasonCodes
-  require Logger
   @opcode 2
   @flags 0b0000
 
