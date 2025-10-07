@@ -64,6 +64,42 @@ Integration test requires a running mosquitto instance.
 mix test # run all tests, 
 mix test --exclude integration  # test packet encoding and decoding, excludes tests with mosquitto
 ```
+
+### Telemetry integration 
+
+mqttc provides native support for Telemetry and exposes metrics for published messages. These metrics allow you to monitor payload sizes and publish durations, which can be visualized using tools like Telemetry.ConsoleReporter, Prometheus.
+
+Example of defining the metrics:
+```elixir
+defmodule MqttObserve.Telemetry do
+  import Telemetry.Metrics
+
+  def metrics do
+    [
+      last_value("mqttc.packet.published.size", unit: :byte),
+      summary("mqttc.packet.published.duration", unit: {:native, :millisecond})
+    ]
+  end
+end
+```
+
+Example of integrating into an application with ConsoleReporter:
+```elixir
+defmodule MqttObserve.Application do
+  use Application
+
+  @impl true
+  def start(_type, _args) do
+    children = [
+      {Telemetry.Metrics.ConsoleReporter, metrics: MqttObserve.Telemetry.metrics()}
+    ]
+
+    Supervisor.start_link(children, strategy: :one_for_one)
+  end
+end
+```
+
+
 ## License
 
 Mqttc is released under the MIT license. See the [license file](LICENSE.txt).
